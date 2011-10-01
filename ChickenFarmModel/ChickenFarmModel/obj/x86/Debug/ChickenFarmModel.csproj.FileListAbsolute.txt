@@ -1,0 +1,5 @@
+C:\Users\Alan\Desktop\Coding\ChickenFarm445\ChickenFarmModel\ChickenFarmModel\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Alan\Desktop\Coding\ChickenFarm445\ChickenFarmModel\ChickenFarmModel\bin\Debug\ChickenFarmModel.exe
+C:\Users\Alan\Desktop\Coding\ChickenFarm445\ChickenFarmModel\ChickenFarmModel\bin\Debug\ChickenFarmModel.pdb
+C:\Users\Alan\Desktop\Coding\ChickenFarm445\ChickenFarmModel\ChickenFarmModel\obj\x86\Debug\ChickenFarmModel.exe
+C:\Users\Alan\Desktop\Coding\ChickenFarm445\ChickenFarmModel\ChickenFarmModel\obj\x86\Debug\ChickenFarmModel.pdb
