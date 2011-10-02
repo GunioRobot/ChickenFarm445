@@ -5,6 +5,8 @@ using System.Text;
 
 namespace ChickenFarmModel
 {
+    // The OrderProcessing class defines a method to be run as a thread whenever
+    // the ChickenFarm receives an order and needs it to be processed
     class OrderProcessing
     {
         private Order pOrder;
@@ -30,10 +32,11 @@ namespace ChickenFarmModel
                     TimeSpan span = endTime.Subtract(pOrder.getStartTime());
 
                     //send receipt (output to console)
-                    Console.Out.WriteLine("Retailer {0} bought {1} chickens for a total of ${2} in {3}ms!", pOrder.getThreadId(), pOrder.getAmount(), total, span.TotalMilliseconds);
+                    Console.Out.WriteLine("Retailer {0} bought {1} chickens for a total of ${2} at price {3} in {4}ms!", pOrder.getThreadId(), pOrder.getAmount(), total, pOrder.getUnitPrice(), span.TotalMilliseconds);
                 }
             }
         }
+
         public void setOrder(Order pOrder)
         {
             this.pOrder = pOrder;

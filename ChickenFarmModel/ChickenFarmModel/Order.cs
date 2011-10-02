@@ -5,6 +5,8 @@ using System.Text;
 
 namespace ChickenFarmModel
 {
+    // the order class describes a set of order objects that the retailer
+    // creates when ordering chickens from the ChickenFarm thread
     class Order
     {
         public static String myDateFormat = "MM/dd/yyyy hh:mm:ss.ffff tt";
@@ -18,8 +20,6 @@ namespace ChickenFarmModel
         {
             startTime = DateTime.Now;
             startTime = startTime.ToUniversalTime();
-            
-            //System.Console.WriteLine(startTime.ToString(Order.myDateFormat) + " NEW ORDER MADE!");
         }
 
         public Int32 getThreadId() { return threadId; }
@@ -32,7 +32,6 @@ namespace ChickenFarmModel
         public void setAmount(int amount) { this.amount = amount; }
         public void setUnitPrice(Int32 unitPrice) { this.unitPrice = unitPrice; }
         public void setStartTime(DateTime startTime) { this.startTime = startTime; }
-        // MUST change the decoder to parse this correctly! lastIndexOf(';') to firstIndexOf(':')
-        public override String ToString() { return threadId + ";" + cardNum + ";" + amount + "=" + startTime.ToString(Order.myDateFormat); }
+        public override String ToString() { return threadId + ";" + cardNum + ";" + amount + "," + unitPrice + "=" + startTime.ToString(Order.myDateFormat); }
     }
 }

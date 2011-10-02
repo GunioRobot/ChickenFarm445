@@ -9,9 +9,8 @@ namespace ChickenFarmModel
     class Retailer
     {
         public static bool[] priceWasCutArray;
-        bool priceWasCut = false;
         Int32 myId;
-        public static Int32 nPrice = 5;
+        public static Int32 nPrice = 5000;
 
         public Retailer(int id)
         {
@@ -19,7 +18,7 @@ namespace ChickenFarmModel
             priceWasCutArray = new bool[Program.NUM_RETAILERS];
             for (int i = 0; i < Program.NUM_RETAILERS; i++)
             {
-                priceWasCutArray[i] = true;
+                priceWasCutArray[i] = false;
             }
         }
 
@@ -28,77 +27,57 @@ namespace ChickenFarmModel
             return myId;
         }
 
-        // for starting thread
+        // method to be run as the 'retailer thread'
         public void retailerFunc()
         {
             while (Program.ChickenFarmIsAlive())
             {
+                //sleep on startup of the loop (whenever the retailer finishes ordering)
                 Thread.Sleep(100);
-                //if(getId() == 1)
-                //System.Console.WriteLine("Retailers {0} starts loop", getId());
+
                 if (priceWasCutArray[getId()])
                 {
-
-                    //is this the formula?
-                    Int32 numOfChickensToOrder = 700 / (nPrice);
-                    Order newOrder = new Order();
-                    newOrder.setAmount(numOfChickensToOrder);
                     Random randNum = new Random();
-                    //what should be card number range????
+
+                    // set the number of chickens to order
+                    Int32 numOfChickensToOrder = 980 / (nPrice);
+                    Order newOrder = new Order();
+                    newOrder.setUnitPrice(nPrice);
+                    newOrder.setAmount(numOfChickensToOrder);
+                    //Sets the order credit card number between 1000 and 9999
                     newOrder.setCardNum(randNum.Next(1000, 9999));
                     newOrder.setThreadId(this.myId);
+                    
+                    //encode the order as a string
                     String encodedOrder = Encoder.encode(newOrder);
-                    //need to lock somehow and check before it sets
-                    //needs to include isAvailable
-                    if (!Program.orderBuffer.IsFull())
-                    {
-                        lock (Program.orderBuffer)
-                        {
-                            Program.orderBuffer.setCell(encodedOrder);
 
-                            //Console.Out.WriteLine("Retailer {0} has set a cell in the buffer", this.myId);
-                            //TODO: time stamp for order placed
-                        }
+                    // keep sleeping until the buffer has an open cell
+                    while (Program.orderBuffer.IsFull())
+                    {
+                        Thread.Sleep(randNum.Next(10, 100));
                     }
 
+                    // lock the buffer so the thread can input its encoded order
+                    lock (Program.orderBuffer)
+                    {
+                        Program.orderBuffer.setCell(encodedOrder);
+                    }
 
-                    priceWasCut = false;
-                    // Console.WriteLine("Retailer {0} changed the bool to {1}.", getId(), priceWasCut);
+                    // indicate that the ordering has been submitted and that the thread
+                    // shouldn't order again until the price is cut again
+                    priceWasCutArray[getId()] = false;
                 }
-                //if(getId() == 1)
-                //System.Console.WriteLine("Retailers {0} ends loop", getId());
-                // Possibly put the priceCut += priceCutEvent here instead of Main
-                // ChickenFarm.getChickenPrice();
-
-
-                //System.Random randNum = new System.Random();
-
-                //                while (!OrderBuffer.setCell(orderString))
-                //                {
-                // Is this the wait we need?
-                //                    Thread.Sleep(randNum.Next(1, 100));
-                //                }
             }
         }
 
         // event handler for when the price is cut
         public void chickenOnSale(Int32 newPrice)
         {
-            // TODO: evaluate price and order
-            //lock (priceWasCutArray)
-            //{
-            //for (int i = 0; i < priceWasCutArray.Length; i++)
-            //{
-
             nPrice = newPrice;
-            priceWasCut = true;
-
-            //}
-            //Console.WriteLine("BOOL CHANGED TO: {0}", priceWasCut);
-            //}
-            // NEED A TIMESTAMP WHEN SUBMITTED
-            // TIME PASSED WILL BE CALCUALTED AND SAVED
-            // SHOULD SECOND PART OF THIS TRANSACTION OCCUR IN THE ORDERPROCESSING THREAD?
+            lock (priceWasCutArray)
+            {
+                for(int i = 0; i < priceWasCutArray.Length; i++) priceWasCutArray[i] = true;
+            }
         }
     }
 }

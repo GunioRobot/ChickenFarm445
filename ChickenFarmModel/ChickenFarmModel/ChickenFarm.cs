@@ -17,8 +17,9 @@ namespace ChickenFarmModel
     {
         private static Int32 chickenPrice;
         private static Int32 numChickens = 2500;
-        private static Int32 priceCutCounter = 0;
+        private static Int32 priceCutCounter = 0; // used to tell when 10 pricecuts have occurred
         private static Int32 newPrice = 5;
+        private OrderProcessing orderProcessingObject;
 
         public static Int32 getNumChickens() { return numChickens; }
         public static Int32 getChickenPrice() { return chickenPrice; }
@@ -32,10 +33,11 @@ namespace ChickenFarmModel
         private const Int32 SHIPPINGRATE = 2;
 
         public static event priceCutEvent priceCut;
-        public void recountChickenss(object sender, ElapsedEventArgs e)
+        public void recountChickens(object sender, ElapsedEventArgs e)
         {
             numChickens += numChickens / 2;
         }
+
         public void farmerFunc()
         {
             // Timestamp used to mark when the thread begins.
@@ -43,72 +45,37 @@ namespace ChickenFarmModel
             startTime = DateTime.Now;
 
             System.Timers.Timer eventTimer = new System.Timers.Timer();
-            eventTimer.Elapsed += new ElapsedEventHandler(recountChickenss);
+            eventTimer.Elapsed += new ElapsedEventHandler(recountChickens);
             eventTimer.Interval = 50;
             eventTimer.AutoReset = true;
             eventTimer.Start();
 
             while (priceCutCounter < 10)
             {
-                System.Console.WriteLine("ChickenFarm starts and sleeps");
-                Thread.Sleep(100); //?
-                System.Console.WriteLine("ChickenFarm wakes up");
-
-
-
-                // PUT THIS IN THE TIMER WITH CHICKEN COUNTER
-                // PUT THIS IN THE TIMER WITH CHICKEN COUNTER
+                Thread.Sleep(100);
 
                 Console.Out.WriteLine("ChickenFarm has {0} chickens left", numChickens);
                 newPrice = PricingModel.reevaluatePrice();
                 ChickenFarm.changePrice(newPrice);
-                // PUT THIS IN THE TIMER WITH CHICKEN COUNTER
-                // PUT THIS IN THE TIMER WITH CHICKEN COUNTER
-                /*
-                // check buffer code
-                lock (OrderBuffer.buffer) //double check this
-                {
-                    if (!OrderBuffer.IsEmpty())
-                    {
-                        for (int i = 0; i < Program.NUM_RETAILERS; i++)
-                        {
-                            // CHANGE THIS TO CREATE AN ORDER PROCESSING THREAD!
-                            System.Console.WriteLine(Decoder.decode(OrderBuffer.Consume(i)));
-                            // CHANGE THIS TO CREATE AN ORDER PROCESSING THREAD!
-                        }
-                    }
-                }
-                 */
-                // check buffer code
-                lock (Program.orderBuffer) //double check this
+
+                lock (Program.orderBuffer)
                 {
                     if (Program.orderBuffer.IsFull())
                     {
-                        OrderProcessing orderProcessingObject = new OrderProcessing();
+                        orderProcessingObject = new OrderProcessing();
                         for (int i = 0; i < Program.NUM_RETAILERS - 1; i++)
                         {
-                            // CHANGE THIS TO CREATE AN ORDER PROCESSING THREAD!
-                            //System.Console.WriteLine(Decoder.decode(Program.orderBuffer.Consume(i)));
                             String s = Program.orderBuffer.Consume(i);
                             if (s != null)
                             {
                                 Order cfOrder = Decoder.decode(s);
-                                //OrderProcessing orderProcessingObject = new OrderProcessing();
                                 orderProcessingObject.setOrder(cfOrder);
                                 Thread orderProcessingThread = new Thread(new ThreadStart(orderProcessingObject.orderProcessing));
                                 orderProcessingThread.Start();
-                                //ORDERPROCESS START with cfOrder
                             }
-
-
-                            // CHANGE THIS TO CREATE AN ORDER PROCESSING THREAD!
                         }
-                        Console.Out.WriteLine("ChickenFarm consumed all cells in buffer");
-
                     }
                 }
-
-                System.Console.WriteLine("ChickenFarm ends iteration");
             }
 
             // Timestamp used to mark when the thread ends.
@@ -127,35 +94,26 @@ namespace ChickenFarmModel
         // Changes the price according to the PricingModel and emits the event callback
         public static void changePrice(Int32 price)
         {
-            // TODO: Don't let anything else access chickenPrice (box it?)
-            // The OrderProcessing threads will try to access chickenPrice
             if (price <= chickenPrice)
             {
                 priceCutCounter++;
                 if (priceCut != null)
                 {
-                    Console.WriteLine("Price cut event executed!");
+                    Console.WriteLine("Price cut event executed! New price: " + price);
                     priceCut(price);
                 }
-                // IF priceCutCounter == 10, TERMINATE THREAD
-                // should this check occur in Main?
             }
             chickenPrice = price;
-            // END TODO
         }
 
         public static void processOrder(Order order)
         {
-            // TODO: check credit card validity
-
             // Calculate order price
             Int32 subtotal, total, tax, shipping;
             subtotal = order.getUnitPrice() * order.getAmount();
             tax = (Int32)(subtotal * TAXRATE);
             shipping = order.getAmount() * SHIPPINGRATE;
             total = subtotal + tax + shipping;
-
-            // TODO: confirm this with retailer
         }
 
         private class PricingModel

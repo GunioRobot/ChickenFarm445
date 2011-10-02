@@ -10,7 +10,6 @@ namespace ChickenFarmModel
     class OrderBuffer
     {
         public static String[] buffer;
-        //bool isFull = false;
 
         public OrderBuffer()
         {
@@ -21,6 +20,7 @@ namespace ChickenFarmModel
             }
         }
 
+        // producer method used to put something in the buffer
         public bool setCell(String s)
         {
             for (int i = 0; i < buffer.Length; i++)
@@ -34,6 +34,7 @@ namespace ChickenFarmModel
             return false;
         }
 
+        // accessor method that tells whether or not the buffer is completely empty
         public bool IsEmpty()
         {
             bool result = true;
@@ -48,6 +49,8 @@ namespace ChickenFarmModel
             }
             return result;
         }
+
+        // accessor method that tells whether or not the buffer is full
         public bool IsFull()
         {
             bool result = false;
@@ -66,6 +69,7 @@ namespace ChickenFarmModel
             return result;
         }
 
+        // consumer method used to remove something from the buffer
         public string Consume(int index)
         {
             string s = buffer[index];
