@@ -35,7 +35,7 @@ namespace ChickenFarmModel
                 retailers[i].Name = (i + 1).ToString();
                 retailers[i].Start();
             }
-            
+
             // wait until the retailer threads stop before ending
             // this implies the ChickenFarm thread is still running
             // because the retailer threads run until the CF ends

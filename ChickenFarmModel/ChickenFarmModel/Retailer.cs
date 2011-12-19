@@ -47,7 +47,7 @@ namespace ChickenFarmModel
                     //Sets the order credit card number between 1000 and 9999
                     newOrder.setCardNum(randNum.Next(1000, 9999));
                     newOrder.setThreadId(this.myId);
-                    
+
                     //encode the order as a string
                     String encodedOrder = Encoder.encode(newOrder);
 

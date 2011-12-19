@@ -26,7 +26,7 @@ namespace ChickenFarmModel
                     shipping = pOrder.getAmount() * SHIPPINGRATE;
                     total = (Int32)(subtotal + tax + shipping);
                     ChickenFarm.setNumChickens(ChickenFarm.getNumChickens() - pOrder.getAmount());
-                    
+
                     // Order finished timestamp
                     DateTime endTime = DateTime.Now.ToUniversalTime();
                     TimeSpan span = endTime.Subtract(pOrder.getStartTime());
